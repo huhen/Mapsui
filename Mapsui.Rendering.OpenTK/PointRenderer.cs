@@ -3,7 +3,8 @@ using System.Linq;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
-using OpenTK.Graphics.ES11;
+//using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.OpenGL;
 
 namespace Mapsui.Rendering.OpenTK
 {
@@ -29,11 +30,11 @@ namespace Mapsui.Rendering.OpenTK
             var color = vectorStyle.Fill.Color;
             GL.Color4((byte) color.R, (byte) color.G, (byte) color.B, (byte) color.A);
             GL.PointSize((float) SymbolStyle.DefaultWidth);
-            GL.EnableClientState(All.VertexArray);
+            GL.EnableClientState(ArrayCap.VertexArray);
             var destAsArray = new[] {(float) destination.X, (float) destination.Y};
-            GL.VertexPointer(2, All.Float, 0, destAsArray);
-            GL.DrawArrays(All.Points, 0, 1);
-            GL.DisableClientState(All.VertexArray);
+            GL.VertexPointer(2, VertexPointerType.Float, 0, destAsArray);
+            GL.DrawArrays(BeginMode.Points, 0, 1);
+            GL.DisableClientState(ArrayCap.VertexArray);
         }
 
         private static void DrawPointWithSymbolStyle(SymbolStyle symbolStyle, Point destination, IDictionary<int, TextureInfo> bitmapCache)

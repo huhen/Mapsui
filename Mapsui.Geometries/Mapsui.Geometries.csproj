@@ -33,6 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Mapsui.Geometries.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Mapsui\Properties\Annotations.cs">
       <Link>Properties\Annotations.cs</Link>
@@ -72,6 +78,9 @@
     <Compile Include="Surface.cs" />
     <Compile Include="Utilities\Algorithms.cs" />
     <Compile Include="Utilities\CGAlgoritm.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Mapsui.Geometries.pfx" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

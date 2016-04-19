@@ -1,10 +1,8 @@
 ﻿using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
-using Mapsui.Geometries;
-using Mapsui.Providers;
-using Mapsui.Styles;
-using OpenTK.Graphics.ES11;
+//using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 
 namespace Mapsui.Rendering.OpenTK
@@ -21,7 +19,7 @@ namespace Mapsui.Rendering.OpenTK
 
             var vectorStyle = style as VectorStyle;
 
-            if (vectorStyle != null)
+            if (vectorStyle != null && vectorStyle.Outline!=null && vectorStyle.Fill!=null)
             {
                 lineWidth = (float)vectorStyle.Outline.Width;
                 lineColor = vectorStyle.Outline.Color;
@@ -37,10 +35,10 @@ namespace Mapsui.Rendering.OpenTK
             // Outline
             GL.LineWidth(lineWidth);
             GL.Color4(lineColor.R, lineColor.G, lineColor.B, lineColor.A);
-            GL.EnableClientState(All.VertexArray);
-            GL.VertexPointer(2, All.Float, 0, points);
-            GL.DrawArrays(All.LineLoop, 0, points.Length / 2);
-            GL.DisableClientState(All.VertexArray);
+            GL.EnableClientState(ArrayCap.VertexArray);
+            GL.VertexPointer(2, VertexPointerType.Float, 0, points);
+            GL.DrawArrays(BeginMode.LineLoop, 0, points.Length / 2);
+            GL.DisableClientState(ArrayCap.VertexArray);
         }
 
         private static float[] ToOpenTK(IList<Point> vertices)

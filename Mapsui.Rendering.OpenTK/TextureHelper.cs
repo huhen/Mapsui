@@ -1,6 +1,7 @@
 using System.IO;
 using Mapsui.Styles;
-using OpenTK.Graphics.ES11;
+//using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.OpenGL;
 
 namespace Mapsui.Rendering.OpenTK
 {
@@ -10,25 +11,25 @@ namespace Mapsui.Rendering.OpenTK
         {
             var textureInfo = new TextureInfo();
 
-            GL.Enable(All.Texture2D);
+            GL.Enable(EnableCap.Texture2D);
             GL.GenTextures(1, out textureInfo.TextureId);
-            GL.BindTexture(All.Texture2D, textureInfo.TextureId);
+            GL.BindTexture(TextureTarget.Texture2D, textureInfo.TextureId);
 
             SetParameters();
 
             PlatformTextureLoader.TexImage2D(textureData, out textureInfo.Width, out textureInfo.Height);
 
-            GL.BindTexture(All.Texture2D, 0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
 
             return textureInfo;
         }
 
         private static void SetParameters()
         {
-            GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-            GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-            GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
-            GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,  (int)All.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
         }
 
         public static void RenderTexture(TextureInfo textureInfo, float x, float y, float orientation = 0,
@@ -38,13 +39,13 @@ namespace Mapsui.Rendering.OpenTK
             float opacity = 1f,
             float scale = 1f)
         {
-            GL.Enable(All.Texture2D);
-            GL.BindTexture(All.Texture2D, textureInfo.TextureId);
+            GL.Enable(EnableCap.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, textureInfo.TextureId);
 
             GL.PushMatrix();
             GL.Translate(x, y, 0f);
             GL.Rotate(orientation, 0, 0, 1);
-            GL.Scale (scale, scale, 1);
+            GL.Scale(scale, scale, 1);
 
             x = offsetX + DetermineHorizontalAlignmentCorrection(horizontalAlignment, textureInfo.Width);
             y = -offsetY + DetermineVerticalAlignmentCorrection(verticalAlignment, textureInfo.Height);
@@ -63,8 +64,8 @@ namespace Mapsui.Rendering.OpenTK
             RenderTextureWithoutBinding(textureInfo.TextureId, vertextArray, opacity);
 
             GL.PopMatrix();
-            GL.BindTexture(All.Texture2D, 0);
-            GL.Disable(All.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.Disable(EnableCap.Texture2D);
         }
 
         private static int DetermineHorizontalAlignmentCorrection(LabelStyle.HorizontalAlignmentEnum horizontalAlignment,
@@ -85,13 +86,13 @@ namespace Mapsui.Rendering.OpenTK
 
         public static void RenderTexture(int textureId, float[] vertextArray)
         {
-            GL.Enable(All.Texture2D);
-            GL.BindTexture(All.Texture2D, textureId);
+            GL.Enable(EnableCap.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, textureId);
 
             RenderTextureWithoutBinding(textureId, vertextArray);
 
-            GL.BindTexture(All.Texture2D, 0);
-            GL.Disable(All.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.Disable(EnableCap.Texture2D);
         }
 
         static readonly float[] TextureArray =
@@ -106,20 +107,20 @@ namespace Mapsui.Rendering.OpenTK
         {
             GL.Color4((byte)255, (byte)255, (byte)255, (byte)(255 * opacity));
 
-            GL.Enable(All.Blend); // Enables the alpha channel to be used in the color buffer
-            GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha); //The operation/order to blend
+            GL.Enable(EnableCap.Blend); // Enables the alpha channel to be used in the color buffer
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha); //The operation/order to blend
 
-            GL.EnableClientState(All.VertexArray);
-            GL.EnableClientState(All.TextureCoordArray);
+            GL.EnableClientState(ArrayCap.VertexArray);
+            GL.EnableClientState(ArrayCap.TextureCoordArray);
+           
+            GL.VertexPointer(2, VertexPointerType.Float,  0, vertextArray);
+            GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, TextureArray);
+            GL.DrawArrays(BeginMode.TriangleFan, 0, 4);
 
-            GL.VertexPointer(2, All.Float, 0, vertextArray);
-            GL.TexCoordPointer(2, All.Float, 0, TextureArray);
-            GL.DrawArrays(All.TriangleFan, 0, 4);
+            GL.Disable(EnableCap.Blend);
 
-            GL.Disable(All.Blend);
-
-            GL.DisableClientState(All.VertexArray);
-            GL.DisableClientState(All.TextureCoordArray);
+            GL.DisableClientState(ArrayCap.VertexArray);
+            GL.DisableClientState(ArrayCap.TextureCoordArray);
         }
     }
 }

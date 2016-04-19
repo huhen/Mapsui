@@ -4,9 +4,11 @@ using Mapsui.Providers;
 using Mapsui.Styles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using OpenTK.Graphics.ES11;
+//using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.OpenGL;
 
 namespace Mapsui.Rendering.OpenTK
 {
@@ -19,6 +21,7 @@ namespace Mapsui.Rendering.OpenTK
 
         public void Render(IViewport viewport, IEnumerable<ILayer> layers)
         {
+
             layers = layers.ToList();
 
             SetAllTextureInfosToUnused();
@@ -28,52 +31,56 @@ namespace Mapsui.Rendering.OpenTK
             RemoveUnusedTextureInfos();
 
             _currentIteration++;
+
         }
 
-		public void DeleteAllBoundTextures()
-		{
-			DeleteAllTileTextures ();
-			DeleteAllSymbolTextures ();
-		}
+        public void DeleteAllBoundTextures()
+        {
+            DeleteAllTileTextures();
+            DeleteAllSymbolTextures();
+        }
 
-		private void DeleteAllSymbolTextures()
-		{
-				foreach (var key in _symbolTextureCache.Keys) {
-					var textureInfo = _symbolTextureCache [key];
-					GL.BindTexture (All.Texture2D, 0);
-					GL.DeleteTextures (1, ref textureInfo.TextureId);
-				}
-				_symbolTextureCache.Clear ();
-		}
+        private void DeleteAllSymbolTextures()
+        {
+            foreach (var key in _symbolTextureCache.Keys)
+            {
+                var textureInfo = _symbolTextureCache[key];
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.DeleteTextures(1, ref textureInfo.TextureId);
+            }
+            _symbolTextureCache.Clear();
+        }
 
-		private void DeleteAllTileTextures()
-		{
-				foreach (var key in _tileTextureCache.Keys) {
-					var textureInfo = _tileTextureCache [key];
-					GL.BindTexture (All.Texture2D, 0);
-					GL.DeleteTextures (1, ref textureInfo.TextureId);
-				}
-				_tileTextureCache.Clear ();
-		}
+        private void DeleteAllTileTextures()
+        {
+            foreach (var key in _tileTextureCache.Keys)
+            {
+                var textureInfo = _tileTextureCache[key];
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.DeleteTextures(1, ref textureInfo.TextureId);
+            }
+            _tileTextureCache.Clear();
+        }
 
         private void RemoveUnusedTextureInfos()
         {
-			var numberOfTilesUsedInCurrentIteration = _tileTextureCache.Values.Count (i => i.IterationUsed == _currentIteration);
+            var numberOfTilesUsedInCurrentIteration = _tileTextureCache.Values.Count(i => i.IterationUsed == _currentIteration);
 
-			var orderedKeys = _tileTextureCache.OrderBy (kvp => kvp.Value.IterationUsed).Select (kvp => kvp.Key).ToList ();
+            var orderedKeys = _tileTextureCache.OrderBy(kvp => kvp.Value.IterationUsed).Select(kvp => kvp.Key).ToList();
 
-			var counter = 0;
-			var tilesToKeep = orderedKeys.Count () * TilesToKeepMultiplier;
-			var numberToRemove = numberOfTilesUsedInCurrentIteration - tilesToKeep;
-			foreach (var key in orderedKeys) {
-				if (counter > numberToRemove)
-					break;
-				var textureInfo = _tileTextureCache [key];
-				_tileTextureCache.Remove (key);
-				GL.BindTexture (All.Texture2D, 0);
-				GL.DeleteTextures (1, ref textureInfo.TextureId);
-				counter++;
-			}
+            var counter = 0;
+            var tilesToKeep = orderedKeys.Count() * TilesToKeepMultiplier;
+            var numberToRemove = numberOfTilesUsedInCurrentIteration - tilesToKeep;
+            foreach (var key in orderedKeys)
+            {
+                if (counter > numberToRemove)
+                    break;
+                var textureInfo = _tileTextureCache[key];
+                _tileTextureCache.Remove(key);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.DeleteTextures(1, ref textureInfo.TextureId);
+                counter++;
+            }
         }
 
         private void SetAllTextureInfosToUnused()
@@ -88,22 +95,41 @@ namespace Mapsui.Rendering.OpenTK
 
         private void RenderFeature(IViewport viewport, IStyle style, IFeature feature)
         {
+            //try
+            //{
             if (feature.Geometry is Point)
             {
                 PointRenderer.Draw(viewport, style, feature, _symbolTextureCache);
+            }
+            else if (feature.Geometry is MultiPoint)
+            {
+                //LineStringRenderer.Draw(viewport, style, feature);
             }
             else if (feature.Geometry is LineString)
             {
                 LineStringRenderer.Draw(viewport, style, feature);
             }
+            else if (feature.Geometry is MultiLineString)
+            {
+                //LineStringRenderer.Draw(viewport, style, feature);
+            }
             else if (feature.Geometry is Polygon)
             {
                 PolygonRenderer.Draw(viewport, style, feature);
+            }
+            else if (feature.Geometry is MultiPolygon)
+            {
+                //PolygonRenderer.Draw(viewport, style, feature);
             }
             else if (feature.Geometry is IRaster)
             {
                 RasterRenderer.Draw(viewport, style, feature, _tileTextureCache, _currentIteration);
             }
+            /*}
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+            }*/
         }
 
         public MemoryStream RenderToBitmapStream(IViewport viewport, IEnumerable<ILayer> layers)

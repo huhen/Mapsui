@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -13,6 +15,7 @@ namespace Mapsui.Rendering.OpenTK
     {
         public static void TexImage2D(Stream data, out int width, out int height)
         {
+ 
             data.Position = 0;
             var bitmap = (Bitmap)Image.FromStream(data);
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -21,6 +24,7 @@ namespace Mapsui.Rendering.OpenTK
             bitmap.UnlockBits(bitmapData);
             width = bitmap.Width;
             height = bitmap.Height;
+
         }
     }
 }

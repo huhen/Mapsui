@@ -1,5 +1,6 @@
 using Mapsui.Styles;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
@@ -16,20 +17,25 @@ namespace Mapsui.Rendering.OpenTK
 
         static PlatformLabelBitmap()
         {
+
             InitializeBitmapAndGraphics(16, 16);
             _graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+
         }
 
         private static void InitializeBitmapAndGraphics(int width, int height)
         {
+
             if (_graphics != null) _graphics.Dispose();
             if (_bitmap != null) _bitmap.Dispose();
             _bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             _graphics = Graphics.FromImage(_bitmap);
+
         }
 
         public static MemoryStream Create(LabelStyle style, string text)
         {
+
             var font = new Font(style.Font.FontFamily, (float)style.Font.Size, FontStyle.Bold);
 
             var size = _graphics.MeasureString(text, font);
@@ -46,6 +52,7 @@ namespace Mapsui.Rendering.OpenTK
             targetBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
             memoryStream.Position = 0;
             return memoryStream;
+
         }
 
         private static Color ToGdi(Styles.Color color)
