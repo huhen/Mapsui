@@ -69,6 +69,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MultiPolygonRenderer.cs" />
+    <Compile Include="MultiLineStringRenderer.cs" />
+    <Compile Include="MultiPointRenderer.cs" />
     <Compile Include="LabelRenderer.cs" />
     <Compile Include="PlatformLabelBitmap.cs" />
     <Compile Include="PlatformTextureLoader.cs" />

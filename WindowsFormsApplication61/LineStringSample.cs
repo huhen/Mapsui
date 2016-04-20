@@ -60,7 +60,7 @@ namespace WindowsFormsApplication61
             {
                 Fill = null,
                 Outline = null,
-                Line = { Color = Color.Red, Width = 4 }
+                Line = { Color = Color.Red, Width = 400 }
             };
         }
     }

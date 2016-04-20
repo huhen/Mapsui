@@ -13,11 +13,16 @@ namespace Mapsui.Rendering.OpenTK
         public static void Draw(IViewport viewport, IStyle style, IFeature feature, IDictionary<int, TextureInfo> bitmapCache)
         {
             var point = feature.Geometry as Point;
+            Draw(viewport, point, style, feature, bitmapCache);
+         }
+
+        public static void Draw(IViewport viewport, Point point, IStyle style, IFeature feature, IDictionary<int, TextureInfo> bitmapCache)
+        {
             var destination = viewport.WorldToScreen(point);
 
             if (style is LabelStyle)
             {
-                var labelStyle = (LabelStyle) style;
+                var labelStyle = (LabelStyle)style;
                 LabelRenderer.Draw(labelStyle, labelStyle.GetLabelText(feature), (float)destination.X, (float)destination.Y);
             }
             var symbolStyle = style as SymbolStyle;

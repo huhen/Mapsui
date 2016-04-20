@@ -95,15 +95,13 @@ namespace Mapsui.Rendering.OpenTK
 
         private void RenderFeature(IViewport viewport, IStyle style, IFeature feature)
         {
-            //try
-            //{
             if (feature.Geometry is Point)
             {
                 PointRenderer.Draw(viewport, style, feature, _symbolTextureCache);
             }
             else if (feature.Geometry is MultiPoint)
             {
-                //LineStringRenderer.Draw(viewport, style, feature);
+                MultiPointRenderer.Draw(viewport, style, feature, _symbolTextureCache);
             }
             else if (feature.Geometry is LineString)
             {
@@ -111,7 +109,7 @@ namespace Mapsui.Rendering.OpenTK
             }
             else if (feature.Geometry is MultiLineString)
             {
-                //LineStringRenderer.Draw(viewport, style, feature);
+                MultiLineStringRenderer.Draw(viewport, style, feature);
             }
             else if (feature.Geometry is Polygon)
             {
@@ -119,17 +117,12 @@ namespace Mapsui.Rendering.OpenTK
             }
             else if (feature.Geometry is MultiPolygon)
             {
-                //PolygonRenderer.Draw(viewport, style, feature);
+                MultiPolygonRenderer.Draw(viewport, style, feature);
             }
             else if (feature.Geometry is IRaster)
             {
                 RasterRenderer.Draw(viewport, style, feature, _tileTextureCache, _currentIteration);
             }
-            /*}
-            catch (Exception ex)
-            {
-                Debug.Print(ex.ToString());
-            }*/
         }
 
         public MemoryStream RenderToBitmapStream(IViewport viewport, IEnumerable<ILayer> layers)

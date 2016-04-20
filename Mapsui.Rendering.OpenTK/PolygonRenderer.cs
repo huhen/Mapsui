@@ -11,7 +11,13 @@ namespace Mapsui.Rendering.OpenTK
     {
         public static void Draw(IViewport viewport, IStyle style, IFeature feature)
         {
-            var lineString = ((Polygon)feature.Geometry).ExteriorRing.Vertices;
+            var polygon = (Polygon) feature.Geometry;
+            Draw(viewport, polygon, style, feature);
+        }
+
+        public static void Draw(IViewport viewport, Polygon polygon, IStyle style, IFeature feature)
+        {
+            var lineString = polygon.ExteriorRing.Vertices;
 
             float lineWidth = 1;
             var lineColor = Color.Black; // default

@@ -185,6 +185,7 @@ namespace Mapsui.Layers
 
         public override bool? IsCrsSupported(string crs)
         {
+            var t = ToSimpleEpsgCode();
             return (String.Equals(ToSimpleEpsgCode(), crs, StringComparison.CurrentCultureIgnoreCase));
         }
 

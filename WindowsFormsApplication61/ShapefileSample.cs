@@ -19,8 +19,8 @@ namespace WindowsFormsApplication61
             var layers = new List<ILayer>();
             try
             {
-                var countrySource = new ShapeFile(GetAppDir() + "\\countries.shp", true) {CRS = "WGS_1984" };
-                var citySource = new ShapeFile(GetAppDir() + "\\cities.shp", true) {CRS = "WGS_1984" };
+                var countrySource = new ShapeFile(GetAppDir() + "\\countries.shp", true) {CRS = "EPSG:3857" };
+                var citySource = new ShapeFile(GetAppDir() + "\\cities.shp", true) {CRS = "EPSG:3857" };
 
                 //layers.Add(new RasterizingLayer(CreateCountryLayer(countrySource)));
                 //layers.Add(new RasterizingLayer(CreateCityLayer(citySource)));
