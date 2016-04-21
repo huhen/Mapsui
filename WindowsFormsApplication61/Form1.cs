@@ -11,6 +11,7 @@ using Mapsui.Geometries;
 using Mapsui.Layers;
 using Mapsui.Providers;
 using Mapsui.Styles;
+using MpLayer;
 using OpenTK.Graphics.OpenGL;
 using Color = System.Drawing.Color;
 
@@ -36,7 +37,8 @@ namespace WindowsFormsApplication61
             var tl = new TileLayer(ts);
             //var s = tl.IsCrsSupported("wgs84");
             mapGLControl1.Map.Layers.Add(tl);
-            mapGLControl1.Map.Layers.Add(LineStringSample.CreateLineStringLayer(LineStringSample.CreateLineStringStyle()));
+            mapGLControl1.Map.Layers.Add(new TrackLayer());
+            //mapGLControl1.Map.Layers.Add(LineStringSample.CreateLineStringLayer(LineStringSample.CreateLineStringStyle()));
 
             /*var style= new LabelStyle();
             style.LabelMethod = GetText;
@@ -58,10 +60,10 @@ namespace WindowsFormsApplication61
             //var l = ShapefileSample.CreateLayers();
             //foreach (var ll in l)
             //{
-                //ll.Opacity = 0.5;
-                //mapGLControl1.Map.Layers.Add(ll);
+            //ll.Opacity = 0.5;
+            //mapGLControl1.Map.Layers.Add(ll);
             //}
-            
+
             //mapGLControl1.ZoomToFullEnvelope();
             mapGLControl1.Refresh();
         }

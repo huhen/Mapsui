@@ -77,7 +77,7 @@ namespace Mapsui.Layers
         public Layer(string layername) : base(layername)
         {
             Cache = new List<IFeature>(); 
-            FetchingPostponedInMilliseconds = 500;
+            FetchingPostponedInMilliseconds = 100;
         }
 
         public override IEnumerable<IFeature> GetFeaturesInView(BoundingBox extent, double resolution)

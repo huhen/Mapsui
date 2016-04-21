@@ -16,6 +16,7 @@
 // along with Mapsui; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 
+using System;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
@@ -28,7 +29,7 @@ namespace Mapsui.Rendering.OpenTK
     {
         public static void Draw(IViewport viewport, IStyle style, IFeature feature)
         {
-            var lineString = (LineString) feature.Geometry;
+            var lineString = (LineString)feature.Geometry;
             Draw(viewport, lineString, style, feature);
         }
 
@@ -38,6 +39,9 @@ namespace Mapsui.Rendering.OpenTK
 
             float lineWidth = 1;
             var lineColor = Color.White;
+            float outLineWidth = 1;
+            var outLineColor = Color.White;
+            var drawOutLine = false;
 
             var vectorStyle = style as VectorStyle;
 
@@ -45,17 +49,153 @@ namespace Mapsui.Rendering.OpenTK
             {
                 lineWidth = (float)vectorStyle.Line.Width;
                 lineColor = vectorStyle.Line.Color;
+                if (vectorStyle.Outline != null)
+                {
+                    outLineWidth = lineWidth + (float)vectorStyle.Outline.Width * 2;
+                    outLineColor = vectorStyle.Outline.Color;
+                    drawOutLine = true;
+                }
             }
 
-            float[] points = ToOpenTK(vertices);
+            //float[] points = ToOpenTK(vertices);
+            float[] points = ToPolygone(vertices, lineWidth);
             WorldToScreen(viewport, points);
 
-            GL.LineWidth(lineWidth);
-            GL.Color4((byte)lineColor.R, (byte)lineColor.G, (byte)lineColor.B, (byte)lineColor.A);
+
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.VertexPointer(2, VertexPointerType.Float, 0, points);
-            GL.DrawArrays(BeginMode.Lines, 0, points.Length / 2);
+            if (drawOutLine)
+            {
+                //GL.LineWidth(1);
+                //GL.Color4((byte)outLineColor.R, (byte)outLineColor.G, (byte)outLineColor.B, (byte)outLineColor.A);
+                //GL.DrawArrays(PrimitiveType.LineStrip, 0, points.Length / 2);
+            }
+            GL.LineWidth(1);
+            GL.Color4((byte)lineColor.R, (byte)lineColor.G, (byte)lineColor.B, (byte)lineColor.A);
+            GL.DrawArrays(PrimitiveType.LineStrip, 0, points.Length / 2);
+
             GL.DisableClientState(ArrayCap.VertexArray);
+        }
+
+        private static float[] ToPolygone(IList<Point> vertices, float width)
+        {
+            var countVert = vertices.Count;
+            if (countVert < 2) return new float[0];
+
+            var points = new Point2D[(countVert) * 4];
+
+            var lastX = (float)vertices[0].X;
+            var lastY = (float)vertices[0].Y;
+            for (var i = 1; i < vertices.Count; i++)
+            {
+                var curX = (float)vertices[i].X;
+                var curY = (float)vertices[i].Y;
+                var vectX = curX - lastX;
+                var vectY = curY - lastY;
+                var perpX = -vectY;
+                var perpY = vectX;
+                var len = (float)Math.Sqrt(perpX * perpX + perpY * perpY);
+                len /= width;
+
+                var curI = i * 4;
+                points[curI + 0].x = perpX / len + lastX;
+                points[curI + 0].y = perpY / len + lastY;
+                points[curI + 1].x = perpX / len + curX;
+                points[curI + 1].y = perpY / len + curY;
+                points[curI + 2].x = -perpX / len + curX;
+                points[curI + 2].y = -perpY / len + curY;
+                points[curI + 3].x = -perpX / len + lastX;
+                points[curI + 3].y = -perpY / len + lastY;
+
+                lastX = curX;
+                lastY = curY;
+            }
+
+            var p = new List<float>();
+
+            p.Add(points[0].x);
+            p.Add(points[0].y);//первая точка
+
+            var tmp = new Point2D();
+            for (var i = 0; i < points.Length - 4; i += 4)
+            {
+                if (intersection(points[i], points[i + 1], points[i + 4], points[i + 5], ref tmp))
+                {
+                    p.Add(tmp.x);
+                    p.Add(tmp.y);
+                }
+                else//линии не пересекаются, соединяем
+                {
+                    p.Add(points[i + 1].x);
+                    p.Add(points[i + 1].y);
+                    p.Add(points[i + 4].x);
+                    p.Add(points[i + 4].y);
+                }
+            }
+
+            p.Add(points[points.Length - 3].x);
+            p.Add(points[points.Length - 3].y);
+            p.Add(points[points.Length - 2].x);
+            p.Add(points[points.Length - 2].y);
+
+            /*for (var i = points.Length - 1; i > 4; i -= 4)
+            {
+                if (intersection(points[i-1], points[i], points[i - 5], points[i - 4], ref tmp))
+                {
+                    p.Add(tmp.x);
+                    p.Add(tmp.y);
+                }
+                else//линии не пересекаются, соединяем
+                {
+                    p.Add(points[i].x);
+                    p.Add(points[i].y);
+                    p.Add(points[i - 5].x);
+                    p.Add(points[i - 5].y);
+                }
+            }*/
+         
+            return p.ToArray();
+        }
+
+        internal struct Point2D
+        {
+            internal float x;
+            internal float y;
+        }
+
+        private static bool intersection(Point2D start1, Point2D end1, Point2D start2, Point2D end2, ref Point2D out_intersection)
+        {
+            //Point2D dir1 = end1 - start1;
+            var dir1 = new Point2D() { x = end1.x - start1.x, y = end1.y - start1.y };
+            //Point2D dir2 = end2 - start2;
+            var dir2 = new Point2D() { x = end2.x - start2.x, y = end2.y - start2.y };
+
+            //считаем уравнения прямых проходящих через отрезки
+            var a1 = -dir1.y;
+            var b1 = +dir1.x;
+            var d1 = -(a1 * start1.x + b1 * start1.y);
+
+            var a2 = -dir2.y;
+            var b2 = +dir2.x;
+            var d2 = -(a2 * start2.x + b2 * start2.y);
+
+            //подставляем концы отрезков, для выяснения в каких полуплоскотях они
+            var seg1_line2_start = a2 * start1.x + b2 * start1.y + d2;
+            var seg1_line2_end = a2 * end1.x + b2 * end1.y + d2;
+
+            var seg2_line1_start = a1 * start2.x + b1 * start2.y + d1;
+            var seg2_line1_end = a1 * end2.x + b1 * end2.y + d1;
+
+            //если концы одного отрезка имеют один знак, значит он в одной полуплоскости и пересечения нет.
+            if ((seg1_line2_start * seg1_line2_end >= 0.0f) || (seg2_line1_start * seg2_line1_end >= 0.0f)) return false;
+
+            var u = seg1_line2_start / (seg1_line2_start - seg1_line2_end);
+            //out_intersection = start1 + u * dir1;
+            out_intersection.x = start1.x + u * dir1.x;
+            out_intersection.y = start1.y + u * dir1.y;
+
+            if ((float.IsNaN(out_intersection.x)) || (float.IsNaN(out_intersection.y))) return false;
+            return true;
         }
 
         private static float[] ToOpenTK(IList<Point> vertices)

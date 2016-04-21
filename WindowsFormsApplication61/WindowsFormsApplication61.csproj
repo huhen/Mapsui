@@ -110,6 +110,10 @@
       <Project>{d74c052a-c07e-4b37-a898-134218aca5c9}</Project>
       <Name>Mapsui</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MpLayer\MpLayer.csproj">
+      <Project>{cbf47d87-e2a7-464c-aef4-a4eb48891ff3}</Project>
+      <Name>MpLayer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
