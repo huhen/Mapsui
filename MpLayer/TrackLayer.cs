@@ -25,6 +25,7 @@ namespace MpLayer
             CRS = "EPSG:3857";
             _trackProvider = new TrackProvider();
             DataSource = _trackProvider;
+           
         }
 
         private IStyle CreateStyle()
@@ -33,7 +34,7 @@ namespace MpLayer
             {
                 Fill = null,
                 Outline = null,
-                Line = { Color = Color.Red, Width = 4 }
+                Line = null,Enabled = false
             };
         }
     }

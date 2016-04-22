@@ -14,7 +14,7 @@ namespace MpLayer
 {
     public class TrackProvider : IProvider, IDisposable
     {
-        private string _crs = "";
+        private string _crs = "EPSG:3857";
         private object _syncRoot;
         private Feature _trackFeature;
         private Feature _positionFeature;
@@ -31,7 +31,7 @@ namespace MpLayer
             {
                 Fill = null,
                 Outline = { Color = Color.Green, Width = 1 },
-                Line = { Color = Color.Red, Width = 40 }
+                Line = { Color = Color.FromArgb(40,255,0,0), Width = 40 }
             };
         }
 

@@ -22,6 +22,13 @@ using Mapsui.Providers;
 using Mapsui.Styles;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
+using System.Diagnostics;
+using OpenTK.Graphics;
+using EnableCap = OpenTK.Graphics.OpenGL.EnableCap;
+using GL = OpenTK.Graphics.OpenGL.GL;
+using MaterialFace = OpenTK.Graphics.OpenGL.MaterialFace;
+using PolygonMode = OpenTK.Graphics.OpenGL.PolygonMode;
+using VertexPointerType = OpenTK.Graphics.OpenGL.VertexPointerType;
 
 namespace Mapsui.Rendering.OpenTK
 {
@@ -45,7 +52,7 @@ namespace Mapsui.Rendering.OpenTK
 
             var vectorStyle = style as VectorStyle;
 
-            if (vectorStyle != null)
+            if (vectorStyle != null && vectorStyle.Line != null)
             {
                 lineWidth = (float)vectorStyle.Line.Width;
                 lineColor = vectorStyle.Line.Color;
@@ -61,7 +68,6 @@ namespace Mapsui.Rendering.OpenTK
             float[] points = ToPolygone(vertices, lineWidth);
             WorldToScreen(viewport, points);
 
-
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.VertexPointer(2, VertexPointerType.Float, 0, points);
             if (drawOutLine)
@@ -72,7 +78,21 @@ namespace Mapsui.Rendering.OpenTK
             }
             GL.LineWidth(1);
             GL.Color4((byte)lineColor.R, (byte)lineColor.G, (byte)lineColor.B, (byte)lineColor.A);
-            GL.DrawArrays(PrimitiveType.LineStrip, 0, points.Length / 2);
+
+            //GL.PointSize(5f);
+            //GL.LineWidth(1f);
+            
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            GL.Disable(EnableCap.DepthTest);
+            GL.Disable(EnableCap.CullFace);
+
+            var tess = new Tesselator();
+     
+            tess.Tesselate(points);
+            tess.Dispose();
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, points.Length / 2);
 
             GL.DisableClientState(ArrayCap.VertexArray);
         }
@@ -82,7 +102,7 @@ namespace Mapsui.Rendering.OpenTK
             var countVert = vertices.Count;
             if (countVert < 2) return new float[0];
 
-            var points = new Point2D[(countVert) * 4];
+            var points = new Point2D[(countVert - 1) * 4];
 
             var lastX = (float)vertices[0].X;
             var lastY = (float)vertices[0].Y;
@@ -98,31 +118,63 @@ namespace Mapsui.Rendering.OpenTK
                 len /= width;
 
                 var curI = i * 4;
-                points[curI + 0].x = perpX / len + lastX;
-                points[curI + 0].y = perpY / len + lastY;
-                points[curI + 1].x = perpX / len + curX;
-                points[curI + 1].y = perpY / len + curY;
-                points[curI + 2].x = -perpX / len + curX;
-                points[curI + 2].y = -perpY / len + curY;
-                points[curI + 3].x = -perpX / len + lastX;
-                points[curI + 3].y = -perpY / len + lastY;
+                points[curI - 4].x = perpX / len + lastX;
+                points[curI - 4].y = perpY / len + lastY;
+                points[curI - 3].x = perpX / len + curX;
+                points[curI - 3].y = perpY / len + curY;
+                points[curI - 2].x = -perpX / len + curX;
+                points[curI - 2].y = -perpY / len + curY;
+                points[curI - 1].x = -perpX / len + lastX;
+                points[curI - 1].y = -perpY / len + lastY;
 
                 lastX = curX;
                 lastY = curY;
             }
 
-            var p = new List<float>();
+            var p = new List<float>(points.Length * 2);
+            var p1 = new List<float>(points.Length * 2);
 
             p.Add(points[0].x);
             p.Add(points[0].y);//первая точка
 
+            /*p1.Add(points[3].x);
+            p1.Add(points[3].y);
+            p1.Add(points[0].x);
+            p1.Add(points[0].y);*/
             var tmp = new Point2D();
+            var lastIntersect = new Point2D();
+            lastIntersect.x = points[0].x;
+            lastIntersect.y = points[0].y;
+            var latUp = true;
             for (var i = 0; i < points.Length - 4; i += 4)
             {
                 if (intersection(points[i], points[i + 1], points[i + 4], points[i + 5], ref tmp))
                 {
                     p.Add(tmp.x);
                     p.Add(tmp.y);
+
+                    p1.Add(lastIntersect.x);
+                    p1.Add(lastIntersect.y);
+                    p1.Add(tmp.x);
+                    p1.Add(tmp.y);
+                    p1.Add(points[i + 3].x);
+                    p1.Add(points[i + 3].y);
+
+                    p1.Add(tmp.x);
+                    p1.Add(tmp.y);
+                    p1.Add(points[i + 2].x);
+                    p1.Add(points[i + 2].y);
+                    p1.Add(points[i + 3].x);
+                    p1.Add(points[i + 3].y);
+
+                    p1.Add(tmp.x);
+                    p1.Add(tmp.y);
+                    p1.Add(points[i + 7].x);
+                    p1.Add(points[i + 7].y);
+                    p1.Add(points[i + 2].x);
+                    p1.Add(points[i + 2].y);
+
+                    latUp = true;
                 }
                 else//линии не пересекаются, соединяем
                 {
@@ -130,7 +182,53 @@ namespace Mapsui.Rendering.OpenTK
                     p.Add(points[i + 1].y);
                     p.Add(points[i + 4].x);
                     p.Add(points[i + 4].y);
+
+                    intersection(points[i + 3], points[i + 2], points[i + 7], points[i + 6], ref tmp);
+
+                    p1.Add(lastIntersect.x);
+                    p1.Add(lastIntersect.y);
+                    p1.Add(points[i+1].x);
+                    p1.Add(points[i+1].y);
+                    p1.Add(tmp.x);
+                    p1.Add(tmp.y);
+
+                    if (latUp)
+                    {
+                        p1.Add(tmp.x);
+                        p1.Add(tmp.y);
+                        p1.Add(points[i + 3].x);
+                        p1.Add(points[i + 3].y);
+                        p1.Add(lastIntersect.x);
+                        p1.Add(lastIntersect.y);
+
+                        p1.Add(points[i + 1].x);
+                        p1.Add(points[i + 1].y);
+                        p1.Add(points[i + 4].x);
+                        p1.Add(points[i + 4].y);
+                        p1.Add(tmp.x);
+                        p1.Add(tmp.y);
+                    }
+                    else
+                    {
+                        p1.Add(tmp.x);
+                        p1.Add(tmp.y);
+                        p1.Add(points[i + 0].x);
+                        p1.Add(points[i + 0].y);
+                        p1.Add(points[i + 1].x);
+                        p1.Add(points[i + 1].y);
+
+                        p1.Add(points[i + 1].x);
+                        p1.Add(points[i + 1].y);
+                        p1.Add(points[i + 4].x);
+                        p1.Add(points[i + 4].y);
+                        p1.Add(tmp.x);
+                        p1.Add(tmp.y);
+                    }
+
+                    latUp = false;
                 }
+                lastIntersect.x = tmp.x;
+                lastIntersect.y = tmp.y;
             }
 
             p.Add(points[points.Length - 3].x);
@@ -138,9 +236,9 @@ namespace Mapsui.Rendering.OpenTK
             p.Add(points[points.Length - 2].x);
             p.Add(points[points.Length - 2].y);
 
-            /*for (var i = points.Length - 1; i > 4; i -= 4)
+            for (var i = points.Length - 1; i > 4; i -= 4)
             {
-                if (intersection(points[i-1], points[i], points[i - 5], points[i - 4], ref tmp))
+                if (intersection(points[i - 1], points[i], points[i - 5], points[i - 4], ref tmp))
                 {
                     p.Add(tmp.x);
                     p.Add(tmp.y);
@@ -152,8 +250,11 @@ namespace Mapsui.Rendering.OpenTK
                     p.Add(points[i - 5].x);
                     p.Add(points[i - 5].y);
                 }
-            }*/
-         
+            }
+            p.Add(points[3].x);
+            p.Add(points[3].y);
+            //p.Add(points[0].x);
+            //p.Add(points[0].y);
             return p.ToArray();
         }
 
