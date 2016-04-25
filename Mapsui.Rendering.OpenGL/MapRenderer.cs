@@ -1,4 +1,4 @@
-using Mapsui.Geometries;
+﻿using Mapsui.Geometries;
 using Mapsui.Layers;
 using Mapsui.Providers;
 using Mapsui.Styles;
@@ -7,10 +7,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-//using OpenTK.Graphics.ES11;
-using OpenTK.Graphics.OpenGL;
 
-namespace Mapsui.Rendering.OpenTK
+namespace Mapsui.Rendering.OpenGL
 {
     public class MapRenderer : IRenderer
     {
@@ -129,6 +127,62 @@ namespace Mapsui.Rendering.OpenTK
         {
             throw new NotImplementedException();
         }
+
+        public void OnHandleCreated(IntPtr handle)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnHandleDestroyed()
+        {
+            /*
+            if (context != null)
+            {
+                context.Dispose();
+                context = null;
+            }
+
+            if (implementation != null)
+            {
+                implementation.WindowInfo.Dispose();
+                implementation = null;
+            }*/
+        }
+
+        public void Clear()
+        {
+            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        }
+
+        void ValidateState()
+        {
+            /*if (IsDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+
+            if (!IsHandleCreated)
+                CreateControl();
+
+            if (implementation == null || context == null || context.IsDisposed)
+                RecreateHandle();*/
+        }
+
+        public void SetupViewport()
+        {
+            /*var w = Width;
+            var h = Height;
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(0, w, h, 0, -1, 1); // Верхний левый угол имеет кооординаты(0, 0)
+            GL.Viewport(0, 0, w, h); // Использовать всю поверхность GLControl под рисование*/
+        }
+
+        public void SwapBuffers()
+        {
+           /* ValidateState();
+            Context.SwapBuffers();*/
+        }
+
+        
     }
 
     public class IdentityComparer<T> : IEqualityComparer<T> where T : class

@@ -39,6 +39,7 @@ namespace MpLayer
         {
             return new LineString(new[]
             {
+                new Point(-10000, 10000),
                 new Point(0, 0),
                 new Point(10000, 10000),
                 new Point(10000, 0),

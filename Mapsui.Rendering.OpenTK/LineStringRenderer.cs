@@ -23,6 +23,7 @@ using Mapsui.Styles;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 using EnableCap = OpenTK.Graphics.OpenGL.EnableCap;
 using GL = OpenTK.Graphics.OpenGL.GL;
@@ -34,6 +35,9 @@ namespace Mapsui.Rendering.OpenTK
 {
     public class LineStringRenderer
     {
+        [DllImport("Render32.dll", EntryPoint = "?test_draw@@YAXXZ", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void test_draw();
+
         public static void Draw(IViewport viewport, IStyle style, IFeature feature)
         {
             var lineString = (LineString)feature.Geometry;
@@ -79,22 +83,27 @@ namespace Mapsui.Rendering.OpenTK
             GL.LineWidth(1);
             GL.Color4((byte)lineColor.R, (byte)lineColor.G, (byte)lineColor.B, (byte)lineColor.A);
 
-            //GL.PointSize(5f);
-            //GL.LineWidth(1f);
-            
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            GL.PointSize(5f);
+            GL.LineWidth(1f);
+
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            //test_draw();
             GL.Disable(EnableCap.DepthTest);
             GL.Disable(EnableCap.CullFace);
 
-            var tess = new Tesselator();
+            /*var tess = new Tesselator();
      
             tess.Tesselate(points);
-            tess.Dispose();
+            tess.Dispose();*/
 
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             //GL.DrawArrays(PrimitiveType.Triangles, 0, points.Length / 2);
 
             GL.DisableClientState(ArrayCap.VertexArray);
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            test_draw();
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
         }
 
         private static float[] ToPolygone(IList<Point> vertices, float width)
@@ -103,6 +112,8 @@ namespace Mapsui.Rendering.OpenTK
             if (countVert < 2) return new float[0];
 
             var points = new Point2D[(countVert - 1) * 4];
+
+            var p1 = new List<float>(points.Length * 2);
 
             var lastX = (float)vertices[0].X;
             var lastY = (float)vertices[0].Y;
@@ -127,12 +138,26 @@ namespace Mapsui.Rendering.OpenTK
                 points[curI - 1].x = -perpX / len + lastX;
                 points[curI - 1].y = -perpY / len + lastY;
 
+                p1.Add(points[curI - 4].x);
+                p1.Add(points[curI - 4].y);
+                p1.Add(points[curI - 3].x);
+                p1.Add(points[curI - 3].y);
+                p1.Add(points[curI - 2].x);
+                p1.Add(points[curI - 2].y);
+
+                p1.Add(points[curI - 2].x);
+                p1.Add(points[curI - 2].y);
+                p1.Add(points[curI - 1].x);
+                p1.Add(points[curI - 1].y);
+                p1.Add(points[curI - 4].x);
+                p1.Add(points[curI - 4].y);
+
                 lastX = curX;
                 lastY = curY;
             }
 
             var p = new List<float>(points.Length * 2);
-            var p1 = new List<float>(points.Length * 2);
+            //var p1 = new List<float>(points.Length * 2);
 
             p.Add(points[0].x);
             p.Add(points[0].y);//первая точка
@@ -146,6 +171,7 @@ namespace Mapsui.Rendering.OpenTK
             lastIntersect.x = points[0].x;
             lastIntersect.y = points[0].y;
             var latUp = true;
+            var ii = 0;
             for (var i = 0; i < points.Length - 4; i += 4)
             {
                 if (intersection(points[i], points[i + 1], points[i + 4], points[i + 5], ref tmp))
@@ -153,7 +179,21 @@ namespace Mapsui.Rendering.OpenTK
                     p.Add(tmp.x);
                     p.Add(tmp.y);
 
-                    p1.Add(lastIntersect.x);
+                    p1[ii * 12 + 2] = tmp.x;
+                    p1[ii * 12 + 3] = tmp.y;
+                    p1[ii * 12 + 12] = tmp.x;
+                    p1[ii * 12 + 13] = tmp.y;
+                    p1[ii * 12 + 22] = tmp.x;
+                    p1[ii * 12 + 23] = tmp.y;
+
+                    p1.Add(tmp.x);
+                    p1.Add(tmp.y);
+                    p1.Add(p1[ii * 12 + 20]);
+                    p1.Add(p1[ii * 12 + 21]);
+                    p1.Add(p1[ii * 12 + 4]);
+                    p1.Add(p1[ii * 12 + 5]);
+
+                    /*p1.Add(lastIntersect.x);
                     p1.Add(lastIntersect.y);
                     p1.Add(tmp.x);
                     p1.Add(tmp.y);
@@ -174,7 +214,7 @@ namespace Mapsui.Rendering.OpenTK
                     p1.Add(points[i + 2].x);
                     p1.Add(points[i + 2].y);
 
-                    latUp = true;
+                    latUp = true;*/
                 }
                 else//линии не пересекаются, соединяем
                 {
@@ -183,9 +223,24 @@ namespace Mapsui.Rendering.OpenTK
                     p.Add(points[i + 4].x);
                     p.Add(points[i + 4].y);
 
-                    intersection(points[i + 3], points[i + 2], points[i + 7], points[i + 6], ref tmp);
+                    if (intersection(points[i + 3], points[i + 2], points[i + 7], points[i + 6], ref tmp))
+                    {
+                        p1[ii * 12 + 4] = tmp.x;
+                        p1[ii * 12 + 5] = tmp.y;
+                        p1[ii * 12 + 6] = tmp.x;
+                        p1[ii * 12 + 7] = tmp.y;
+                        p1[ii * 12 + 20] = tmp.x;
+                        p1[ii * 12 + 21] = tmp.y;
 
-                    p1.Add(lastIntersect.x);
+                        p1.Add(tmp.x);
+                        p1.Add(tmp.y);
+                        p1.Add(p1[ii * 12 + 2]);
+                        p1.Add(p1[ii * 12 + 3]);
+                        p1.Add(p1[ii * 12 + 12]);
+                        p1.Add(p1[ii * 12 + 13]);
+                    }
+
+                    /*p1.Add(lastIntersect.x);
                     p1.Add(lastIntersect.y);
                     p1.Add(points[i+1].x);
                     p1.Add(points[i+1].y);
@@ -225,8 +280,9 @@ namespace Mapsui.Rendering.OpenTK
                         p1.Add(tmp.y);
                     }
 
-                    latUp = false;
+                    latUp = false;*/
                 }
+                ii++;
                 lastIntersect.x = tmp.x;
                 lastIntersect.y = tmp.y;
             }
@@ -255,7 +311,7 @@ namespace Mapsui.Rendering.OpenTK
             p.Add(points[3].y);
             //p.Add(points[0].x);
             //p.Add(points[0].y);
-            return p.ToArray();
+            return p1.ToArray();
         }
 
         internal struct Point2D
