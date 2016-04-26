@@ -30,7 +30,7 @@
         {
             Mapsui.Map map1 = new Mapsui.Map();
             Mapsui.Styles.Color color1 = new Mapsui.Styles.Color();
-            this.mapGLControl1 = new OpenTK.MapGLControl();
+            this.mapGLControl1 = new Mapsui.UI.OpenGL.MapGLControl();
             this.SuspendLayout();
             // 
             // mapGLControl1
@@ -52,7 +52,6 @@
             this.mapGLControl1.Name = "mapGLControl1";
             this.mapGLControl1.Size = new System.Drawing.Size(754, 408);
             this.mapGLControl1.TabIndex = 0;
-            this.mapGLControl1.VSync = false;
             this.mapGLControl1.Resize += new System.EventHandler(this.mapGLControl1_Resize);
             // 
             // Form1
@@ -70,7 +69,7 @@
 
         #endregion
 
-        private OpenTK.MapGLControl mapGLControl1;
+        private Mapsui.UI.OpenGL.MapGLControl mapGLControl1;
     }
 }
 

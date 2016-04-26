@@ -166,7 +166,7 @@ namespace Mapsui.Rendering.OpenGL
                 RecreateHandle();*/
         }
 
-        public void SetupViewport()
+        public void SetupViewport(int width, int height)
         {
             /*var w = Width;
             var h = Height;
@@ -174,6 +174,7 @@ namespace Mapsui.Rendering.OpenGL
             GL.LoadIdentity();
             GL.Ortho(0, w, h, 0, -1, 1); // Верхний левый угол имеет кооординаты(0, 0)
             GL.Viewport(0, 0, w, h); // Использовать всю поверхность GLControl под рисование*/
+            //GL.ClearColor(Color.SkyBlue);
         }
 
         public void SwapBuffers()
@@ -182,7 +183,11 @@ namespace Mapsui.Rendering.OpenGL
             Context.SwapBuffers();*/
         }
 
-        
+
+        public void OnParentChanged()
+        {
+
+        }
     }
 
     public class IdentityComparer<T> : IEqualityComparer<T> where T : class

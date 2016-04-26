@@ -12,8 +12,6 @@ using Mapsui.Layers;
 using Mapsui.Providers;
 using Mapsui.Styles;
 using MpLayer;
-using OpenTK.Graphics.OpenGL;
-using Color = System.Drawing.Color;
 
 namespace WindowsFormsApplication61
 {
@@ -27,7 +25,7 @@ namespace WindowsFormsApplication61
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            GL.ClearColor(Color.SkyBlue);
+            //GL.ClearColor(Color.SkyBlue);
             //SetupViewport();
             _loaded = true;
 

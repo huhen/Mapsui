@@ -336,13 +336,7 @@ namespace Mapsui.UI.OpenGL
                 return;
             }
 
-            if (Configuration.RunningOnMacOS)
-            {
-                DelayUpdate delay = PerformContextUpdate;
-                BeginInvoke(delay); //Need the native window to resize first otherwise our control will be in the wrong place.
-            }
-            else if (context != null)
-                context.Update(Implementation.WindowInfo);
+            base.OnResize(e);
 
             if (Width == 0) return;
             if (Height == 0) return;
@@ -354,23 +348,10 @@ namespace Mapsui.UI.OpenGL
             ViewChanged(true);
             Invalidate();
 
-            _renderer.SetupViewport();
+            _renderer.SetupViewport(ClientSize.Width, ClientSize.Height);
             base.OnResize(e);
         }
 
-
-        /// <summary>
-        /// Needed to delay the invoke on OS X. Also needed because OpenTK is .NET 2, otherwise I'd use an inline Action.
-        /// </summary>
-        public delegate void DelayUpdate();
-        /// <summary>
-        /// Execute the delayed context update
-        /// </summary>
-        public void PerformContextUpdate()
-        {
-            if (context != null)
-                context.Update(Implementation.WindowInfo);
-        }
 
         /// <summary>
         /// Raises the ParentChanged event.
@@ -378,9 +359,7 @@ namespace Mapsui.UI.OpenGL
         /// <param name="e">A System.EventArgs that contains the event data.</param>
         protected override void OnParentChanged(EventArgs e)
         {
-            if (context != null)
-                context.Update(Implementation.WindowInfo);
-
+            _renderer.OnParentChanged();
             base.OnParentChanged(e);
         }
 

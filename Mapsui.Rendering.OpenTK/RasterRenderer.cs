@@ -14,7 +14,7 @@ namespace Mapsui.Rendering.OpenTK
             try
             {
                 var raster = (IRaster)feature.Geometry;
-
+                
                 TextureInfo textureInfo;
 
                 if (!TextureCache.Keys.Contains(raster))
