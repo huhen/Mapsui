@@ -20,24 +20,13 @@ using System;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
-using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using OpenTK.Graphics;
-using EnableCap = OpenTK.Graphics.OpenGL.EnableCap;
-using GL = OpenTK.Graphics.OpenGL.GL;
-using MaterialFace = OpenTK.Graphics.OpenGL.MaterialFace;
-using PolygonMode = OpenTK.Graphics.OpenGL.PolygonMode;
-using VertexPointerType = OpenTK.Graphics.OpenGL.VertexPointerType;
+using InteropRender32;
 
-namespace Mapsui.Rendering.OpenTK
+namespace Mapsui.Rendering.OpenGL
 {
     public class LineStringRenderer
     {
-        [DllImport("Render32.dll", EntryPoint = "?test_draw@@YAXXZ", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void test_draw();
-
         public static void Draw(IViewport viewport, IStyle style, IFeature feature)
         {
             var lineString = (LineString)feature.Geometry;
@@ -68,43 +57,11 @@ namespace Mapsui.Rendering.OpenTK
                 }
             }
 
-            //float[] points = ToOpenTK(vertices);
-            float[] points = ToPolygone(vertices, lineWidth);
+            float[] points = ToOpenTK(vertices);
+            //float[] points = ToPolygone(vertices, lineWidth);
             WorldToScreen(viewport, points);
 
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.VertexPointer(2, VertexPointerType.Float, 0, points);
-            if (drawOutLine)
-            {
-                //GL.LineWidth(1);
-                //GL.Color4((byte)outLineColor.R, (byte)outLineColor.G, (byte)outLineColor.B, (byte)outLineColor.A);
-                //GL.DrawArrays(PrimitiveType.LineStrip, 0, points.Length / 2);
-            }
-            GL.LineWidth(1);
-           
-            GL.Color4((byte)lineColor.R, (byte)lineColor.G, (byte)lineColor.B, (byte)lineColor.A);
-
-            GL.PointSize(5f);
-            GL.LineWidth(1f);
-
-            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-            //test_draw();
-            GL.Disable(EnableCap.DepthTest);
-            GL.Disable(EnableCap.CullFace);
-
-            /*var tess = new Tesselator();
-     
-            tess.Tesselate(points);
-            tess.Dispose();*/
-
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, points.Length / 2);
-
-            GL.DisableClientState(ArrayCap.VertexArray);
-
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-            test_draw();
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            OpenGlRender.DrawSimplePolyLine(points, lineWidth, lineColor.ToArgb());
         }
 
         private static float[] ToPolygone(IList<Point> vertices, float width)

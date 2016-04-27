@@ -18,6 +18,11 @@ namespace Mapsui.Styles
             B = color.B;
         }
 
+        public uint ToArgb()
+        {
+            return ((uint)A << 24) | ((uint)R << 16) | ((uint)G << 8) | (uint)B;
+        }
+
         public static Color FromArgb(int a, int r, int g, int b)
         {
             return new Color { A = a, R = r, G = g, B = b };
@@ -42,7 +47,7 @@ namespace Mapsui.Styles
         public static Color Indigo { get { return new Color { A = 255, R = 75, G = 0, B = 130 }; } }
         public static Color Violet { get { return new Color { A = 255, R = 238, G = 130, B = 238 }; } }
 
-        
+
         public override bool Equals(object obj)
         {
             if (!(obj is Color))
@@ -57,7 +62,7 @@ namespace Mapsui.Styles
             if (A != color.A) return false;
             if (R != color.R) return false;
             if (G != color.G) return false;
-            if (B != color.B) return false; 
+            if (B != color.B) return false;
             return true;
         }
 
@@ -76,5 +81,5 @@ namespace Mapsui.Styles
             return !Equals(color1, color2);
         }
 
-            }
+    }
 }

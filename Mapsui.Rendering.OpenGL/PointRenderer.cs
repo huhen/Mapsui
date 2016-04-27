@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
-//using OpenTK.Graphics.ES11;
-using OpenTK.Graphics.OpenGL;
+using InteropRender32;
 
-namespace Mapsui.Rendering.OpenTK
+namespace Mapsui.Rendering.OpenGL
 {
     public class PointRenderer
     {
@@ -33,13 +31,7 @@ namespace Mapsui.Rendering.OpenTK
         private static void DrawPointWithVectorStyle(VectorStyle vectorStyle, Point destination)
         {
             var color = vectorStyle.Fill.Color;
-            GL.Color4((byte) color.R, (byte) color.G, (byte) color.B, (byte) color.A);
-            GL.PointSize((float) SymbolStyle.DefaultWidth);
-            GL.EnableClientState(ArrayCap.VertexArray);
-            var destAsArray = new[] {(float) destination.X, (float) destination.Y};
-            GL.VertexPointer(2, VertexPointerType.Float, 0, destAsArray);
-            GL.DrawArrays(PrimitiveType.Points, 0, 1);
-            GL.DisableClientState(ArrayCap.VertexArray);
+            OpenGlRender.DrawSimplePoint((float)destination.X, (float)destination.Y, (float)SymbolStyle.DefaultWidth, color.ToArgb());
         }
 
         private static void DrawPointWithSymbolStyle(SymbolStyle symbolStyle, Point destination, IDictionary<int, TextureInfo> bitmapCache)

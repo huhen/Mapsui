@@ -4,9 +4,9 @@ using Mapsui.Providers;
 using Mapsui.Styles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using InteropRender32;
 
 namespace Mapsui.Rendering.OpenGL
 {
@@ -15,7 +15,9 @@ namespace Mapsui.Rendering.OpenGL
         readonly IDictionary<int, TextureInfo> _symbolTextureCache = new Dictionary<int, TextureInfo>();
         readonly IDictionary<object, TextureInfo> _tileTextureCache = new Dictionary<object, TextureInfo>(new IdentityComparer<object>());
         private long _currentIteration;
-        private const int TilesToKeepMultiplier = 3;
+        private const int _tilesToKeepMultiplier = 3;
+
+        private OpenGlRender _gl = new OpenGlRender();
 
         public void Render(IViewport viewport, IEnumerable<ILayer> layers)
         {
@@ -43,8 +45,7 @@ namespace Mapsui.Rendering.OpenGL
             foreach (var key in _symbolTextureCache.Keys)
             {
                 var textureInfo = _symbolTextureCache[key];
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-                GL.DeleteTextures(1, ref textureInfo.TextureId);
+                OpenGlRender.DeleteTexture(textureInfo.TextureId);
             }
             _symbolTextureCache.Clear();
         }
@@ -54,8 +55,7 @@ namespace Mapsui.Rendering.OpenGL
             foreach (var key in _tileTextureCache.Keys)
             {
                 var textureInfo = _tileTextureCache[key];
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-                GL.DeleteTextures(1, ref textureInfo.TextureId);
+                OpenGlRender.DeleteTexture(textureInfo.TextureId);
             }
             _tileTextureCache.Clear();
         }
@@ -67,7 +67,7 @@ namespace Mapsui.Rendering.OpenGL
             var orderedKeys = _tileTextureCache.OrderBy(kvp => kvp.Value.IterationUsed).Select(kvp => kvp.Key).ToList();
 
             var counter = 0;
-            var tilesToKeep = orderedKeys.Count() * TilesToKeepMultiplier;
+            var tilesToKeep = orderedKeys.Count() * _tilesToKeepMultiplier;
             var numberToRemove = numberOfTilesUsedInCurrentIteration - tilesToKeep;
             foreach (var key in orderedKeys)
             {
@@ -75,8 +75,7 @@ namespace Mapsui.Rendering.OpenGL
                     break;
                 var textureInfo = _tileTextureCache[key];
                 _tileTextureCache.Remove(key);
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-                GL.DeleteTextures(1, ref textureInfo.TextureId);
+                OpenGlRender.DeleteTexture(textureInfo.TextureId);
                 counter++;
             }
         }
@@ -179,8 +178,8 @@ namespace Mapsui.Rendering.OpenGL
 
         public void SwapBuffers()
         {
-           /* ValidateState();
-            Context.SwapBuffers();*/
+            /* ValidateState();
+             Context.SwapBuffers();*/
         }
 
 
