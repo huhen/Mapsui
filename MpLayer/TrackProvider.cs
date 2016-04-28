@@ -31,7 +31,7 @@ namespace MpLayer
             {
                 Fill = null,
                 Outline = { Color = Color.Green, Width = 1 },
-                Line = { Color = Color.FromArgb(40,255,0,0), Width = 40 }
+                Line = { Color = Color.FromArgb(40,0,0,160), Width = 5 }
             };
         }
 

@@ -236,7 +236,6 @@ namespace Mapsui.UI.OpenGL
             SetStyle(ControlStyles.Opaque, true);
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            DoubleBuffered = false;
 
             // Note: the DesignMode property may be incorrect when nesting controls.
             // We use LicenseManager.UsageMode as a workaround (this only works in
@@ -275,8 +274,9 @@ namespace Mapsui.UI.OpenGL
         /// <param name="e">Not used.</param>
         protected override void OnHandleCreated(EventArgs e)
         {
-            _renderer.OnHandleCreated(Handle);
+            DoubleBuffered = false;
 
+            _renderer.OnHandleCreated(Handle);
             base.OnHandleCreated(e);
 
             if (resize_event_suppressed)
@@ -344,12 +344,10 @@ namespace Mapsui.UI.OpenGL
             Map.Viewport.Width = Width;
             Map.Viewport.Height = Height;
 
+            _renderer.SetupViewport(ClientSize.Width, ClientSize.Height);
 
             ViewChanged(true);
             Invalidate();
-
-            _renderer.SetupViewport(ClientSize.Width, ClientSize.Height);
-            base.OnResize(e);
         }
 
 

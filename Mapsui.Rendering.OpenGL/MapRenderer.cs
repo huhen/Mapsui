@@ -129,28 +129,17 @@ namespace Mapsui.Rendering.OpenGL
 
         public void OnHandleCreated(IntPtr handle)
         {
-            throw new NotImplementedException();
+            _gl.Init(handle);
         }
 
         public void OnHandleDestroyed()
         {
-            /*
-            if (context != null)
-            {
-                context.Dispose();
-                context = null;
-            }
-
-            if (implementation != null)
-            {
-                implementation.WindowInfo.Dispose();
-                implementation = null;
-            }*/
+            _gl.DeleteContext();
         }
 
         public void Clear()
         {
-            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            OpenGlRender.Clear();
         }
 
         void ValidateState()
@@ -167,19 +156,12 @@ namespace Mapsui.Rendering.OpenGL
 
         public void SetupViewport(int width, int height)
         {
-            /*var w = Width;
-            var h = Height;
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.Ortho(0, w, h, 0, -1, 1); // Верхний левый угол имеет кооординаты(0, 0)
-            GL.Viewport(0, 0, w, h); // Использовать всю поверхность GLControl под рисование*/
-            //GL.ClearColor(Color.SkyBlue);
+            OpenGlRender.SetupViewPort(width, height);
         }
 
         public void SwapBuffers()
         {
-            /* ValidateState();
-             Context.SwapBuffers();*/
+            _gl.SwapBuffersContext();
         }
 
 
