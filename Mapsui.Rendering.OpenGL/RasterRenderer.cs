@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
+using InteropRender32;
 
 namespace Mapsui.Rendering.OpenGL
 {
@@ -30,7 +31,7 @@ namespace Mapsui.Rendering.OpenGL
                 textureInfo.IterationUsed = currentIteration;
                 TextureCache[raster] = textureInfo;
                 var destination = WorldToScreen(viewport, feature.Geometry.GetBoundingBox());
-                TextureHelper.RenderTexture(textureInfo.TextureId, ToVertexArray(RoundToPixel(destination)));
+                OpenGlRender.RenderTexture(textureInfo.TextureId, ToVertexArray(RoundToPixel(destination)));
             }
             catch (Exception ex)
             {

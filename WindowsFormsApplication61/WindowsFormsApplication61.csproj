@@ -14,7 +14,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -33,9 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BruTile, Version=0.18.2.0, Culture=neutral, PublicKeyToken=00e75fd79e391f40, processorArchitecture=MSIL">
+    <Reference Include="BruTile, Version=0.18.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Mapsui\Mapsui\Mapsui\bin\Debug\BruTile.dll</HintPath>
+      <HintPath>..\..\BruTile\Release\Portable\BruTile.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
