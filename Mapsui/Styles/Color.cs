@@ -5,6 +5,8 @@ namespace Mapsui.Styles
 {
     public class Color
     {
+        private uint _color;
+
         public Color()
         {
             A = 255;
@@ -12,26 +14,69 @@ namespace Mapsui.Styles
 
         public Color(Color color)
         {
-            A = color.A;
-            R = color.R;
-            G = color.G;
-            B = color.B;
+            _color = color.ToArgb;
+            //A = color.A;
+            //R = color.R;
+            //G = color.G;
+            //B = color.B;
         }
 
-        public uint ToArgb()
-        {
-            return ((uint)A << 24) | ((uint)R << 16) | ((uint)G << 8) | (uint)B;
-        }
+        public uint ToArgb => _color;
 
-        public static Color FromArgb(int a, int r, int g, int b)
+        //public uint ToArgb()
+        //{
+        //    return ((uint)A << 24) | ((uint)B << 16) | ((uint)G << 8) | (uint)R;
+        //}
+
+        public static Color FromArgb(byte a, byte r, byte g, byte b)
         {
             return new Color { A = a, R = r, G = g, B = b };
         }
 
-        public int A { get; set; }
-        public int R { get; set; }
-        public int G { get; set; }
-        public int B { get; set; }
+        public byte A
+        {
+            get { return (byte)(_color >> 24); }
+            set
+            {
+                _color &= 0x00FFFFFF;
+                _color |= (uint)value << 24;
+            }
+        }
+
+        public byte B
+        {
+            get { return (byte)(_color >> 16); }
+            set
+            {
+                _color &= 0xFF00FFFF;
+                _color |= (uint)value << 16;
+            }
+        }
+
+        public byte G
+        {
+            get { return (byte)(_color>>8); }
+            set
+            {
+                _color &= 0xFFFF00FF;
+                _color |= (uint)value <<8;
+            }
+        }
+
+        public byte R
+        {
+            get { return (byte)_color; }
+            set
+            {
+                _color &= 0xFFFFFF00;
+                _color |= value;
+            }
+        }
+
+
+        //public int R { get; set; }
+        //public int G { get; set; }
+        //public int B { get; set; }
 
         public static Color Black { get { return new Color { A = 255, R = 0, G = 0, B = 0 }; } }
         public static Color White { get { return new Color { A = 255, R = 255, G = 255, B = 255 }; } }

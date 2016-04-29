@@ -31,7 +31,7 @@ namespace MpLayer
             {
                 Fill = null,
                 Outline = { Color = Color.Green, Width = 1 },
-                Line = { Color = Color.FromArgb(10,0,0,160), Width = 4 }
+                Line = { Color = Color.FromArgb(128,255,0,0), Width = 4 }
             };
         }
 
@@ -52,7 +52,7 @@ namespace MpLayer
                 new Point(0, 1000000),
                 new Point(10000000, 10000000),
                 new Point(10000000, 0),
-                new Point(-10000, 100000)
+                new Point(9000000, 1000)
             });
         }
 

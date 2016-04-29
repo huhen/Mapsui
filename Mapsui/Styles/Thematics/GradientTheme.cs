@@ -246,7 +246,7 @@ namespace Mapsui.Styles.Thematics
             if (b > 255) b = 255;
             if (a > 255) a = 255;
 
-            return Color.FromArgb((int)a, (int)r, (int)g, (int)b);
+            return Color.FromArgb((byte)a, (byte)r, (byte)g, (byte)b);
         }
             }
 }

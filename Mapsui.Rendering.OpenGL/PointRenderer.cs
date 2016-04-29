@@ -31,7 +31,7 @@ namespace Mapsui.Rendering.OpenGL
         private static void DrawPointWithVectorStyle(VectorStyle vectorStyle, Point destination)
         {
             var color = vectorStyle.Fill.Color;
-            OpenGlRender.DrawSimplePoint((float)destination.X, (float)destination.Y, (float)SymbolStyle.DefaultWidth, color.ToArgb());
+            OpenGlRender.DrawSimplePoint((float)destination.X, (float)destination.Y, (float)SymbolStyle.DefaultWidth, color.ToArgb);
         }
 
         private static void DrawPointWithSymbolStyle(SymbolStyle symbolStyle, Point destination, IDictionary<int, TextureInfo> bitmapCache)

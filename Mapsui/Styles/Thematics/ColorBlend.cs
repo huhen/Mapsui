@@ -78,10 +78,10 @@ namespace Mapsui.Styles.Thematics
 			while (i < Positions.Length && Positions[i] < pos)
 				i++;
 			double frac = (pos - Positions[i - 1]) / (Positions[i] - Positions[i - 1]);
-			var red = (int)Math.Round((Colors[i - 1].R * (1 - frac) + Colors[i].R * frac));
-			var green = (int)Math.Round((Colors[i - 1].G * (1 - frac) + Colors[i].G * frac));
-			var blue = (int)Math.Round((Colors[i - 1].B * (1 - frac) + Colors[i].B * frac));
-			var alpha = (int)Math.Round((Colors[i - 1].A * (1 - frac) + Colors[i].A * frac));
+			var red = (byte)Math.Round((Colors[i - 1].R * (1 - frac) + Colors[i].R * frac));
+			var green = (byte)Math.Round((Colors[i - 1].G * (1 - frac) + Colors[i].G * frac));
+			var blue = (byte)Math.Round((Colors[i - 1].B * (1 - frac) + Colors[i].B * frac));
+			var alpha = (byte)Math.Round((Colors[i - 1].A * (1 - frac) + Colors[i].A * frac));
 
             return new Color { A = alpha, R = red, G = green, B = blue }; //Not sure how to assign in case of equal naming
 

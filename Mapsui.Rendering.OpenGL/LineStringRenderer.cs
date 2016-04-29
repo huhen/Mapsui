@@ -60,7 +60,7 @@ namespace Mapsui.Rendering.OpenGL
             float[] points = ToOpenTK(vertices);
             //float[] points = ToPolygone(vertices, lineWidth);
             WorldToScreen(viewport, points);
-            _gl.DrawFinePolyLine(points, lineWidth, lineColor.ToArgb());
+            _gl.DrawFinePolyLine(points, lineWidth, lineColor.ToArgb);
             //OpenGlRender.DrawSimplePolyLine(points, lineWidth, lineColor.ToArgb());
         }
 
@@ -70,7 +70,7 @@ namespace Mapsui.Rendering.OpenGL
             int numberOfCoordinates = vertices.Count * 2 - 2; // Times two because of duplicate begin en end. Minus two because the very begin and end need no duplicate
             var points = new float[vertices.Count * dimensions];
 
-            for (var i = 0; i < vertices.Count - 1; i++)
+            for (var i = 0; i < vertices.Count; i++)
             {
                 points[i * 2 + 0] = (float)vertices[i].X;
                 points[i * 2 + 1] = (float)vertices[i].Y;

@@ -38,7 +38,7 @@ namespace Mapsui.Rendering.OpenGL
             // Not implemented. It might be hard to draw a concave polygon with holes.             
             
             // Outline
-            OpenGlRender.DrawSimplePolygone(points, lineWidth, lineColor.ToArgb());
+            OpenGlRender.DrawSimplePolygone(points, lineWidth, lineColor.ToArgb);
         }
 
         private static float[] ToOpenTK(IList<Point> vertices)
