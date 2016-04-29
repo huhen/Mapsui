@@ -36,6 +36,8 @@ namespace WindowsFormsApplication61
             //var s = tl.IsCrsSupported("wgs84");
             mapGLControl1.Map.Layers.Add(tl);
             mapGLControl1.Map.Layers.Add(new TrackLayer());
+            
+            
             //mapGLControl1.Map.Layers.Add(LineStringSample.CreateLineStringLayer(LineStringSample.CreateLineStringStyle()));
 
             /*var style= new LabelStyle();

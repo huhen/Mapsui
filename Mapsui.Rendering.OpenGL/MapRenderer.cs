@@ -102,11 +102,11 @@ namespace Mapsui.Rendering.OpenGL
             }
             else if (feature.Geometry is LineString)
             {
-                LineStringRenderer.Draw(viewport, style, feature);
+                LineStringRenderer.Draw(_gl,viewport, style, feature);
             }
             else if (feature.Geometry is MultiLineString)
             {
-                MultiLineStringRenderer.Draw(viewport, style, feature);
+                MultiLineStringRenderer.Draw(_gl, viewport, style, feature);
             }
             else if (feature.Geometry is Polygon)
             {

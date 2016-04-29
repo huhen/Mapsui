@@ -16,6 +16,7 @@
 // along with Mapsui; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 
+using InteropRender32;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
@@ -24,11 +25,11 @@ namespace Mapsui.Rendering.OpenGL
 {
     class MultiLineStringRenderer
     {
-        public static void Draw(IViewport viewport, IStyle style, IFeature feature)
+        public static void Draw(OpenGlRender _gl, IViewport viewport, IStyle style, IFeature feature)
         {
             var lines = (MultiLineString)feature.Geometry;
             foreach (var lineString in lines.LineStrings)
-                LineStringRenderer.Draw(viewport, lineString, style, feature);
+                LineStringRenderer.Draw(_gl,viewport, lineString, style, feature);
         }
     }
 }

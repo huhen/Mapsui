@@ -27,13 +27,13 @@ namespace Mapsui.Rendering.OpenGL
 {
     public class LineStringRenderer
     {
-        public static void Draw(IViewport viewport, IStyle style, IFeature feature)
+        public static void Draw(OpenGlRender _gl, IViewport viewport, IStyle style, IFeature feature)
         {
             var lineString = (LineString)feature.Geometry;
-            Draw(viewport, lineString, style, feature);
+            Draw(_gl, viewport, lineString, style, feature);
         }
 
-        public static void Draw(IViewport viewport, LineString lineString, IStyle style, IFeature feature)
+        public static void Draw(OpenGlRender _gl, IViewport viewport, LineString lineString, IStyle style, IFeature feature)
         {
             var vertices = lineString.Vertices;
 
@@ -60,7 +60,7 @@ namespace Mapsui.Rendering.OpenGL
             float[] points = ToOpenTK(vertices);
             //float[] points = ToPolygone(vertices, lineWidth);
             WorldToScreen(viewport, points);
-            OpenGlRender.DrawFinePolyLine(points, lineWidth, lineColor.ToArgb());
+            _gl.DrawFinePolyLine(points, lineWidth, lineColor.ToArgb());
             //OpenGlRender.DrawSimplePolyLine(points, lineWidth, lineColor.ToArgb());
         }
 
@@ -68,14 +68,14 @@ namespace Mapsui.Rendering.OpenGL
         {
             const int dimensions = 2; // x and y are both in one array
             int numberOfCoordinates = vertices.Count * 2 - 2; // Times two because of duplicate begin en end. Minus two because the very begin and end need no duplicate
-            var points = new float[numberOfCoordinates * dimensions];
+            var points = new float[vertices.Count * dimensions];
 
             for (var i = 0; i < vertices.Count - 1; i++)
             {
-                points[i * 4 + 0] = (float)vertices[i].X;
-                points[i * 4 + 1] = (float)vertices[i].Y;
-                points[i * 4 + 2] = (float)vertices[i + 1].X;
-                points[i * 4 + 3] = (float)vertices[i + 1].Y;
+                points[i * 2 + 0] = (float)vertices[i].X;
+                points[i * 2 + 1] = (float)vertices[i].Y;
+                //points[i * 4 + 2] = (float)vertices[i + 1].X;
+                //points[i * 4 + 3] = (float)vertices[i + 1].Y;
             }
             return points;
         }
