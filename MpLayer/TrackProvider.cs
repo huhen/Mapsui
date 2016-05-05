@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Mapsui.Geometries;
 using Mapsui.Providers;
 using Mapsui.Styles;
@@ -31,7 +34,7 @@ namespace MpLayer
             {
                 Fill = null,
                 Outline = { Color = Color.Green, Width = 1 },
-                Line = { Color = Color.FromArgb(255, 255, 0, 0), Width = 4 }
+                Line = { Color = Color.FromArgb(160, 255, 0, 0), Width = 4 }
             };
         }
 
@@ -168,6 +171,7 @@ namespace MpLayer
 
         private static IGeometry CreateTestGeometry()
         {
+            /*
             var cf = new ProjNet.CoordinateSystems.CoordinateSystemFactory();
             var f = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory();
 
@@ -185,7 +189,25 @@ namespace MpLayer
             var mercatorY_lat = 6743368.67;
             ToGeographic(ref mercatorX_lon, ref mercatorY_lat);
             var p1 = 2000000;
-            return new LineString(new[]
+            */
+            var p = new List<Point>();
+            using (var f = new StreamReader("123.plt"))
+            {
+                string s;
+                while ((s = f.ReadLine()) != null)
+                {
+                    var sa = s.Split(',');
+                    if (sa.Length != 7) continue;
+                    double x, y;
+                    if (double.TryParse(sa[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) &&
+                        double.TryParse(sa[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y))
+                    {
+                        p.Add(new Point(lonToX(y), latToY(x)+38640));
+                    }
+                }
+            }
+            return new LineString(p);
+            /*return new LineString(new[]
             {
                 new Point(0, 0),
                 new Point(674114.95+p, 6887329.56+p1),
@@ -223,7 +245,7 @@ namespace MpLayer
                 new Point(10000000, 10000000),
                 new Point(10000000, 0),
                 new Point(9000000, 1000)*/
-            });
+            //});
         }
 
         public TrackProvider()
