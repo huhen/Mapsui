@@ -47,20 +47,43 @@ namespace Mapsui.Rendering.OpenGL
 
             if (vectorStyle != null && vectorStyle.Line != null)
             {
-                lineWidth = (float)vectorStyle.Line.Width;
-                lineColor = vectorStyle.Line.Color;
                 if (vectorStyle.Outline != null)
                 {
                     outLineWidth = lineWidth + (float)vectorStyle.Outline.Width * 2;
                     outLineColor = vectorStyle.Outline.Color;
                     drawOutLine = true;
                 }
+
+                var k = viewport.Resolution / 100000;
+                Console.WriteLine(k);
+                if (k > 1)
+                {
+                    lineWidth = (float)(vectorStyle.Line.Width / 2);
+                    drawOutLine = false;
+                }
+                else if (k > 0.006)
+                {
+                    lineWidth = (float)(vectorStyle.Line.Width / 1.5);
+                    drawOutLine = false;
+                }
+                else
+                {
+                    lineWidth = (float)vectorStyle.Line.Width;
+                }
+
+                lineColor = vectorStyle.Line.Color;
+
             }
 
             float[] points = ToOpenTK(vertices);
             //float[] points = ToPolygone(vertices, lineWidth);
             WorldToScreen(viewport, points);
-            _gl.DrawFinePolyLine(points, lineWidth, lineColor.ToArgb);
+            if(drawOutLine)
+            _gl.DrawFinePolyLine(points, lineWidth, lineColor.ToArgb, outLineColor.ToArgb);
+            else
+            {
+                _gl.DrawFinePolyLine(points, lineWidth, lineColor.ToArgb);
+            }
             //OpenGlRender.DrawSimplePolyLine(points, lineWidth, lineColor.ToArgb());
         }
 
@@ -84,6 +107,7 @@ namespace Mapsui.Rendering.OpenGL
         {
             for (var i = 0; i < points.Length / 2; i++)
             {
+
                 var point = viewport.WorldToScreen(points[i * 2], points[i * 2 + 1]);
                 points[i * 2] = (float)point.X;
                 points[i * 2 + 1] = (float)point.Y;

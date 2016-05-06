@@ -34,7 +34,7 @@ namespace MpLayer
             {
                 Fill = null,
                 Outline = { Color = Color.Green, Width = 1 },
-                Line = { Color = Color.FromArgb(160, 255, 0, 0), Width = 4 }
+                Line = { Color = Color.FromArgb(160, 255, 0, 0), Width = 3 }
             };
         }
 
@@ -150,6 +150,9 @@ namespace MpLayer
             return phi * RAD_DEG;
         }
 
+        static double lat2y_m(double lat) { return 6378137 * Math.Log(Math.Tan(Math.PI / 4 + (((lat) * Math.PI) / 180) / 2)); }
+        static double lon2x_m(double lon) { return (((lon) * Math.PI) / 180) * 6378137; }
+
         private static void ToGeographic(ref double mercatorX_lon, ref double mercatorY_lat)
         {
             if (Math.Abs(mercatorX_lon) < 180 && Math.Abs(mercatorY_lat) < 90)
@@ -191,6 +194,7 @@ namespace MpLayer
             var p1 = 2000000;
             */
             var p = new List<Point>();
+            double lastxx = 0; double lastyy=0;
             using (var f = new StreamReader("123.plt"))
             {
                 string s;
@@ -202,10 +206,38 @@ namespace MpLayer
                     if (double.TryParse(sa[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) &&
                         double.TryParse(sa[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y))
                     {
-                        p.Add(new Point(lonToX(y), latToY(x)+38640));
+                        var xx = lon2x_m(y);
+                        var yy = lat2y_m(x);
+                        var t = xx - lastxx;
+                        var tt = yy - lastyy;
+                        if ((t*t + tt*tt) > 100)
+                        {
+                            p.Add(new Point(xx, yy));
+                            lastxx = xx;
+                            lastyy = yy;
+                        }
+                        //lastxx = xx;
+                        //lastyy = yy;
+                        //p.Add(new Point(lonToX(y), latToY(x)+38640));
+                        //p.Add(new Point(xx, yy));
                     }
                 }
             }
+            /*p.Clear();
+            p.Add(new Point(-10000, 10000));
+            p.Add(new Point(0, 0));
+            p.Add(new Point(10000, 10000));
+            p.Add(new Point(10000, 0));
+            p.Add(new Point(0, 10000));
+            p.Add(new Point(100000, 100000));
+            p.Add(new Point(100000, 0));
+            p.Add(new Point(0, 100000));
+            p.Add(new Point(1000000, 1000000));
+            p.Add(new Point(1000000, 0));
+            p.Add(new Point(0, 1000000));
+            p.Add(new Point(10000000, 10000000));
+            p.Add(new Point(10000000, 0));
+            p.Add(new Point(9000000, 1000));*/
             return new LineString(p);
             /*return new LineString(new[]
             {
