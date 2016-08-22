@@ -23,21 +23,26 @@ namespace WindowsFormsApplication61
             InitializeComponent();
         }
 
+        private byte[] test(Uri uri)
+        {
+            return new byte[0];
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             //GL.ClearColor(Color.SkyBlue);
             //SetupViewport();
             _loaded = true;
 
-            var ts = KnownTileSources.Create();
+            var ts = KnownTileSources.Create(KnownTileSource.OpenStreetMap, null, null, test);
             ts.Name = "OSM";
             //ts.Schema.Srs = "EPSG:3857";
             var tl = new TileLayer(ts);
             //var s = tl.IsCrsSupported("wgs84");
             mapGLControl1.Map.Layers.Add(tl);
             mapGLControl1.Map.Layers.Add(new TrackLayer());
-            
-            
+
+
             //mapGLControl1.Map.Layers.Add(LineStringSample.CreateLineStringLayer(LineStringSample.CreateLineStringStyle()));
 
             /*var style= new LabelStyle();

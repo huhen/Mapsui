@@ -32,7 +32,7 @@ namespace Mapsui.UI.OpenGL
         //Indicates that a redraw is needed. This often coincides with 
         //manipulation but not in the case of new data arriving.
         private bool _viewInitialized;
-        private readonly MapRenderer _renderer = new MapRenderer();
+        private MapRenderer _renderer;
 
         public event EventHandler ErrorMessageChanged;
 
@@ -244,6 +244,8 @@ namespace Mapsui.UI.OpenGL
                 DesignMode ||
                 LicenseManager.UsageMode == LicenseUsageMode.Designtime;
 
+            if (!design_mode)
+                _renderer = new MapRenderer();
             InitializeComponent();
         }
 
@@ -275,8 +277,8 @@ namespace Mapsui.UI.OpenGL
         protected override void OnHandleCreated(EventArgs e)
         {
             DoubleBuffered = false;
-
-            _renderer.OnHandleCreated(Handle);
+            if (!design_mode)
+                _renderer.OnHandleCreated(Handle);
             base.OnHandleCreated(e);
 
             if (resize_event_suppressed)
@@ -293,7 +295,8 @@ namespace Mapsui.UI.OpenGL
             // Ensure that context is still alive when passing to events
             // => This allows to perform cleanup operations in OnHandleDestroyed handlers
             base.OnHandleDestroyed(e);
-            _renderer.OnHandleDestroyed();
+            if (!design_mode)
+                _renderer.OnHandleDestroyed();
         }
 
         /// <summary>
@@ -344,7 +347,8 @@ namespace Mapsui.UI.OpenGL
             Map.Viewport.Width = Width;
             Map.Viewport.Height = Height;
 
-            _renderer.SetupViewport(ClientSize.Width, ClientSize.Height);
+            if (!design_mode)
+                _renderer.SetupViewport(ClientSize.Width, ClientSize.Height);
 
             ViewChanged(true);
             Invalidate();
@@ -357,7 +361,8 @@ namespace Mapsui.UI.OpenGL
         /// <param name="e">A System.EventArgs that contains the event data.</param>
         protected override void OnParentChanged(EventArgs e)
         {
-            _renderer.OnParentChanged();
+            if (!design_mode)
+                _renderer.OnParentChanged();
             base.OnParentChanged(e);
         }
 
